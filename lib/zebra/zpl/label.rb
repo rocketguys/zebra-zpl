@@ -9,7 +9,7 @@ module Zebra
 
       attr_writer :copies
       attr_reader :elements, :tempfile
-      attr_accessor :width, :length, :print_speed
+      attr_accessor :width, :length, :print_speed, :font_map
 
       def initialize(options = {})
         options.each_pair { |key, value| self.__send__("#{key}=", value) if self.respond_to?("#{key}=") }
@@ -47,6 +47,13 @@ module Zebra
         io << "^PR#{print_speed}"
         # Density (D command) "Carried over from EPL, does this exist in ZPL ????"
         # io << "D#{print_density}\n" if print_density
+
+        # ^CW<letter>,<device>:<font name>
+        if font_map
+          font_map.each_pair do |letter, file|
+            io << "^CW#{letter.upcase},#{file.upcase}"
+          end
+        end
 
         # TEST ZPL (comment everything else out)...
         # io << "^XA^WD*:*.FNT*^XZ"
